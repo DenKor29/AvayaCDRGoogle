@@ -4,8 +4,9 @@ import avayacdr.network.TCPConnection;
 import avayacdr.network.TCPConnectionListener;
 
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.SocketTimeoutException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.*;
 import java.util.ArrayList;
 
 public class ApplicationServer implements TCPConnectionListener {
@@ -15,6 +16,7 @@ public class ApplicationServer implements TCPConnectionListener {
 
     private Thread rxThread;
     private ApplicationServerListener eventListener;
+    private String token;
 
 
     protected String NameServer;
@@ -34,6 +36,7 @@ public class ApplicationServer implements TCPConnectionListener {
 
         this.eventListener = eventListener;
         this.NameServer = nameServer;
+        this.token = "";
     }
 
     public  void start(int port,int timeoutAcept){
@@ -48,6 +51,24 @@ public class ApplicationServer implements TCPConnectionListener {
         rxThread.start();
 
     }
+    private void GooglePost(String value){
+        try {
+            URL url = new URL("https://script.google.com/macros/s/AKfycbxtBR7lt25OQWFN0q_-l3nBnQlLFPuQ0sLD3E8p1eQ/dev");
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "text/plain");
+            OutputStream os = con.getOutputStream();
+            OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
+            osw.write(value);
+            osw.flush();
+            osw.close();
+            os.close();  //don't forget to close the OutputStream
+            con.connect();
+        } catch (IOException e) {
+            System.out.println("Exeption: "+e );
+        }
+    }
+
     private void connected(int port,int timeoutAcept) {
 
         System.out.println("Start "+ NameServer + " - listening port " + port);
@@ -115,6 +136,7 @@ public class ApplicationServer implements TCPConnectionListener {
     public synchronized void onReceiveString(TCPConnection tcpConnection, String value) {
 
         eventListener.onMessageString(ApplicationServer.this,tcpConnection,value);
+        GooglePost(value);
     }
 
     @Override
