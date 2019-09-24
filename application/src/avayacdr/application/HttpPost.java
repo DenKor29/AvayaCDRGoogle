@@ -1,13 +1,11 @@
 package avayacdr.application;
 
-import java.io.BufferedReader;
-import java.io.Closeable;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class HttpPost {
 
@@ -16,28 +14,71 @@ public class HttpPost {
     }
 
     private String response;
+    private String postUrl;
+    Map<String,Object> params;
 
-    public HttpPost(String postUrl, String data) {
+    public HttpPost(String postUrl ) {
 
-        try {
-            response = post(postUrl, data);
-            System.out.println(response);
-        } catch(IOException ioe) {
-            ioe.printStackTrace();
-        }
+        this.response = null;
+        this.postUrl = postUrl;
+        this.params = new LinkedHashMap<>();
     }
 
-    public String post(String postUrl, String data) throws IOException {
-        URL url = new URL(postUrl);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("POST");
-        con.setRequestProperty("Content-Type", "application/json");
+    public void addParameters(String key, String value){
+        params.put(key,value);
+    }
+    public void clear(){
+        params.clear();
+    }
 
-        con.setDoOutput(true);
+    private String getParameters(){
 
-        this.sendData(con, data);
+        StringBuilder postData = new StringBuilder();
+        try {
 
-        return this.read(con.getInputStream());
+            for (Map.Entry<String,Object> param : params.entrySet()) {
+            if (postData.length() != 0) postData.append('&');
+                postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+                postData.append('=');
+                postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+            }
+        }
+        catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        return postData.toString();
+    }
+
+        public String doPost()  {
+            return doPost(getParameters());
+        }
+
+        public String doPost(String query)  {
+
+        try {
+
+            URL url = new URL(postUrl);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+            String encodedQuery = URLEncoder.encode(query, "UTF-8");
+            String postData = "e=" + encodedQuery;
+
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            con.setRequestProperty("Content-Length",  String.valueOf(postData.length()));
+            con.setDoOutput(true);
+
+            this.sendData(con, postData);
+
+            response = read(con.getInputStream());
+            System.out.println(response);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
+
+        return response;
     }
 
     protected void sendData(HttpURLConnection con, String data) throws IOException {

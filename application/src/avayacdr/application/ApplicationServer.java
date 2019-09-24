@@ -17,6 +17,7 @@ public class ApplicationServer implements TCPConnectionListener {
     private Thread rxThread;
     private ApplicationServerListener eventListener;
     private String token;
+    private HttpPost httpPost;
 
 
     protected String NameServer;
@@ -37,9 +38,12 @@ public class ApplicationServer implements TCPConnectionListener {
         this.eventListener = eventListener;
         this.NameServer = nameServer;
         this.token = "";
+        this.httpPost = new HttpPost("https://script.google.com/macros/s/AKfycbyuUmXbmQorEZP1CJ733xUofjNH_EHqo0r6WcTzYwo_Vj5ZPDM/exec");
     }
 
     public  void start(int port,int timeoutAcept){
+
+        GooglePost("test");
 
         rxThread = new Thread(new Runnable() {
             @Override
@@ -52,21 +56,12 @@ public class ApplicationServer implements TCPConnectionListener {
 
     }
     private void GooglePost(String value){
-        try {
-            URL url = new URL("https://script.google.com/macros/s/AKfycbxtBR7lt25OQWFN0q_-l3nBnQlLFPuQ0sLD3E8p1eQ/dev");
-            HttpURLConnection con = (HttpURLConnection)url.openConnection();
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Content-Type", "text/plain");
-            OutputStream os = con.getOutputStream();
-            OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-            osw.write(value);
-            osw.flush();
-            osw.close();
-            os.close();  //don't forget to close the OutputStream
-            con.connect();
-        } catch (IOException e) {
-            System.out.println("Exeption: "+e );
-        }
+       //httpPost.clear();
+        httpPost.addParameters("login","admin");
+        httpPost.addParameters("password","admin");
+        String response = httpPost.doPost();
+        System.out.println("Response: "+ response );
+
     }
 
     private void connected(int port,int timeoutAcept) {
