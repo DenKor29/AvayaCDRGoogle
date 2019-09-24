@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ public class HttpPost {
     private String response;
     private String postUrl;
     Map<String,Object> params;
+    Map<String,Object> keys;
 
     public HttpPost(String postUrl ) {
 
@@ -34,18 +36,14 @@ public class HttpPost {
     private String getParameters(){
 
         StringBuilder postData = new StringBuilder();
-        try {
-
+            int i = 0;
             for (Map.Entry<String,Object> param : params.entrySet()) {
-            if (postData.length() != 0) postData.append('&');
-                postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+            if (i != 0) postData.append(",");
+                postData.append(param.getKey());
                 postData.append('=');
-                postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+                postData.append(param.getValue());
+                i++;
             }
-        }
-        catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
 
         return postData.toString();
     }
@@ -53,24 +51,21 @@ public class HttpPost {
     private String getParametersJson(){
 
         StringBuilder postData = new StringBuilder();
-        try {
+        int i = 0;
             postData.append('{');
             for (Map.Entry<String,Object> param : params.entrySet()) {
-                if (postData.length() != 0) postData.append(',');
+                if (i != 0) postData.append(',');
                 postData.append('"');
-                postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+                postData.append(param.getKey());
                 postData.append('"');
-                postData.append(":'");
+                postData.append(":");
                 postData.append('"');
-                postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+                postData.append(param.getValue());
                 postData.append('"');
+                i++;
             }
             postData.append('}');
-        }
-        catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        postData.append('{');
+
         return postData.toString();
     }
 
@@ -78,19 +73,44 @@ public class HttpPost {
         return doPost(getParameters());
     }
     public String doPostJSON()  {
-        return doPost(getParametersJson());
+
+        String parametersJson=getParametersJson();
+        clear();
+
+        byte[] bytes = new byte[0];
+        try {
+            bytes = parametersJson.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        String query = Base64.getEncoder().encodeToString(bytes);
+
+
+        addParameters("name","tarif");
+        addParameters("zip","0");
+        addParameters("data",query);
+
+        String request = getParameters();
+
+
+        System.out.println("Json "+ parametersJson );
+        System.out.println("Request: "+ request );
+
+        return doPost(request);
     }
 
         public String doPost(String query)  {
 
         try {
 
-            String authStr = "apikey:password";
+
             URL url = new URL(postUrl);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
             String encodedQuery = URLEncoder.encode(query, "UTF-8");
-            String postData = "e=" + encodedQuery;
+            String postData = encodedQuery;
+            System.out.println("Query: "+ postData );
 
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
