@@ -38,7 +38,7 @@ public class ApplicationServer implements TCPConnectionListener {
         this.eventListener = eventListener;
         this.NameServer = nameServer;
         this.token = "";
-        this.httpPost = new HttpPost("https://script.google.com/macros/s/AKfycbyuUmXbmQorEZP1CJ733xUofjNH_EHqo0r6WcTzYwo_Vj5ZPDM/exec");
+        this.httpPost = new HttpPost("https://script.google.com/macros/s/AKfycbxtBR7lt25OQWFN0q_-l3nBnQlLFPuQ0sLD3E8p1eQ/dev");
     }
 
     public  void start(int port,int timeoutAcept){
@@ -56,10 +56,11 @@ public class ApplicationServer implements TCPConnectionListener {
 
     }
     private void GooglePost(String value){
-       //httpPost.clear();
+        httpPost.clear();
+        httpPost.addParameters("command","auth");
         httpPost.addParameters("login","admin");
         httpPost.addParameters("password","admin");
-        String response = httpPost.doPost();
+        String response = httpPost.doPostJSON();
         System.out.println("Response: "+ response );
 
     }

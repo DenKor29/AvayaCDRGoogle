@@ -28,7 +28,7 @@ public class HttpPost {
         params.put(key,value);
     }
     public void clear(){
-        params.clear();
+        if (params != null) params.clear();
     }
 
     private String getParameters(){
@@ -50,14 +50,42 @@ public class HttpPost {
         return postData.toString();
     }
 
-        public String doPost()  {
-            return doPost(getParameters());
+    private String getParametersJson(){
+
+        StringBuilder postData = new StringBuilder();
+        try {
+            postData.append('{');
+            for (Map.Entry<String,Object> param : params.entrySet()) {
+                if (postData.length() != 0) postData.append(',');
+                postData.append('"');
+                postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+                postData.append('"');
+                postData.append(":'");
+                postData.append('"');
+                postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+                postData.append('"');
+            }
+            postData.append('}');
         }
+        catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        postData.append('{');
+        return postData.toString();
+    }
+
+    public String doPost()  {
+        return doPost(getParameters());
+    }
+    public String doPostJSON()  {
+        return doPost(getParametersJson());
+    }
 
         public String doPost(String query)  {
 
         try {
 
+            String authStr = "apikey:password";
             URL url = new URL(postUrl);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
