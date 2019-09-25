@@ -15,6 +15,7 @@ public class HttpPost {
     }
 
     private String response;
+
     private String postUrl;
     Map<String,Object> params;
     Map<String,Object> keys;
@@ -38,10 +39,14 @@ public class HttpPost {
         StringBuilder postData = new StringBuilder();
             int i = 0;
             for (Map.Entry<String,Object> param : params.entrySet()) {
-            if (i != 0) postData.append(",");
+            if (i != 0) postData.append("&");
                 postData.append(param.getKey());
                 postData.append('=');
-                postData.append(param.getValue());
+                try {
+                    postData.append(URLEncoder.encode(param.getValue().toString(), "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
                 i++;
             }
 
@@ -108,8 +113,8 @@ public class HttpPost {
             URL url = new URL(postUrl);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-            String encodedQuery = URLEncoder.encode(query, "UTF-8");
-            String postData = encodedQuery;
+            String postData = query;
+
             System.out.println("Query: "+ postData );
 
             con.setRequestMethod("POST");
@@ -120,7 +125,7 @@ public class HttpPost {
             this.sendData(con, postData);
 
             response = read(con.getInputStream());
-            System.out.println(response);
+
         } catch(IOException e) {
             e.printStackTrace();
         }

@@ -4,10 +4,13 @@ import avayacdr.network.TCPConnection;
 import avayacdr.network.TCPConnectionListener;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.*;
 import java.util.ArrayList;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 
 public class ApplicationServer implements TCPConnectionListener {
 
@@ -21,6 +24,7 @@ public class ApplicationServer implements TCPConnectionListener {
 
 
     protected String NameServer;
+
 
     public String getNameServer() {
         return NameServer;
@@ -37,13 +41,14 @@ public class ApplicationServer implements TCPConnectionListener {
 
         this.eventListener = eventListener;
         this.NameServer = nameServer;
-        this.token = "";
+        this.token = null;
         this.httpPost = new HttpPost("https://script.google.com/macros/s/AKfycbyuUmXbmQorEZP1CJ733xUofjNH_EHqo0r6WcTzYwo_Vj5ZPDM/exec");
     }
 
     public  void start(int port,int timeoutAcept){
 
-        GooglePost("test");
+        GooglePostAuth();
+        GooglePostAppend("150300119;22409506239088;0001;0;*52;0;000");
 
         rxThread = new Thread(new Runnable() {
             @Override
@@ -55,13 +60,57 @@ public class ApplicationServer implements TCPConnectionListener {
         rxThread.start();
 
     }
-    private void GooglePost(String value){
+    private void GooglePostAuth(){
         httpPost.clear();
-       httpPost.addParameters("command","auth");
-       httpPost.addParameters("login","admin");
+        httpPost.addParameters("command","auth");
+        httpPost.addParameters("login","admin");
         httpPost.addParameters("password","admin");
         String response = httpPost.doPostJSON();
+        token = getJsonKey(response,"token");
+
         System.out.println("Response: "+ response );
+        System.out.println("Token: "+ token );
+
+
+    }
+
+    private void GooglePostAppend(String value){
+
+        if (token.isEmpty()) return;
+
+        httpPost.clear();
+        httpPost.addParameters("token",token);
+        httpPost.addParameters("command","append");
+        httpPost.addParameters("value",value);
+        String response = httpPost.doPostJSON();
+        System.out.println("Response: "+ response );
+
+        String result = getJsonKey(response,"result");
+
+        System.out.println("Result: "+ result );
+
+
+    }
+
+
+    private String getJsonKey(String input,String key){
+        String str = null;
+
+        JSONParser parser = new JSONParser();
+
+        try {
+            Object obj = parser.parse(input);
+
+            JSONObject jsonObject =  (JSONObject) obj;
+
+            str = (String) jsonObject.get(key);
+
+
+        } catch (ParseException e) {
+           // e.printStackTrace();
+        }
+        return str;
+
 
     }
 
@@ -132,7 +181,7 @@ public class ApplicationServer implements TCPConnectionListener {
     public synchronized void onReceiveString(TCPConnection tcpConnection, String value) {
 
         eventListener.onMessageString(ApplicationServer.this,tcpConnection,value);
-        GooglePost(value);
+        GooglePostAppend(value);
     }
 
     @Override
