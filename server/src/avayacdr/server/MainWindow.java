@@ -87,7 +87,7 @@ public class MainWindow extends JFrame  implements ApplicationServerListener {
 
 
 
-         port = configurationSettings.getInt("appport",9100);
+         port = configurationSettings.getInt("appport",9102);
          timeoutacept = configurationSettings.getInt("apptimeoutacept",30000);
          appserverstart = configurationSettings.getInt("appserverstart",1);
 

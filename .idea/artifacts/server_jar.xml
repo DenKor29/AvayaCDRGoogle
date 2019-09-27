@@ -5,10 +5,8 @@
       <element id="module-output" name="server" />
       <element id="module-output" name="network" />
       <element id="module-output" name="core" />
-      <element id="module-output" name="database" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/mysql-connector-java-8.0.16.jar" path-in-jar="/" />
-      <element id="module-output" name="http" />
       <element id="module-output" name="application" />
+      <element id="library" level="project" name="json-simple-1.1.1" />
     </root>
   </artifact>
 </component>

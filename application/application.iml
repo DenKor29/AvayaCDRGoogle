@@ -7,8 +7,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="network" />
-    <orderEntry type="library" name="json-simple-1.1.1" level="project" />
-    <orderEntry type="module" module-name="core" />
+    <orderEntry type="module" module-name="network" exported="" />
+    <orderEntry type="library" exported="" name="json-simple-1.1.1" level="project" />
+    <orderEntry type="module" module-name="core" exported="" />
   </component>
 </module>
