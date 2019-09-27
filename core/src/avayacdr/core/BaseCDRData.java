@@ -13,7 +13,7 @@ public class BaseCDRData {
     public int duration;
     public String value;
 
-    public void SetPropertyCDR(String name, String value) {
+    public void SetPropertyCDR( String value) {
 
        this.value = value;
        this.name = name;

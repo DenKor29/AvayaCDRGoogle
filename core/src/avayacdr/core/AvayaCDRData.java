@@ -21,18 +21,17 @@ public class AvayaCDRData extends BaseCDRData {
 
     public void AvayCDRData()
     {
-        SetPropertyCDR("avaya","");
+        SetPropertyCDR("");
     }
 
     @Override
-    public void SetPropertyCDR(String name, String value) {
+    public void SetPropertyCDR(String value) {
 
         String localValue = value.trim();
 
-        if (!name.startsWith("avaya")) return;
         if (localValue.length() < 70) return ;
 
-        super.SetPropertyCDR(name, localValue);
+        super.SetPropertyCDR(localValue);
         SetFieldCDRTime(localValue,DATATIMEFORMAT,0,11);
         this.duration = GetFieldCDRInt(localValue,12,16,0);
         this.cond_code = GetFieldCDR(localValue,17,18);
@@ -51,5 +50,32 @@ public class AvayaCDRData extends BaseCDRData {
         this.code_return = GetFieldCDR(localValue,92,93);
         this.line_feed = GetFieldCDR(localValue,93,94);
 
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(date);stringBuilder.append(";");
+        stringBuilder.append(callingNumber);stringBuilder.append(";");
+        stringBuilder.append(calledNumber);stringBuilder.append(";");
+        stringBuilder.append(duration);stringBuilder.append(";");
+        stringBuilder.append(cond_code);stringBuilder.append(";");
+        stringBuilder.append(code_dial);stringBuilder.append(";");
+        stringBuilder.append(code_used);stringBuilder.append(";");
+        stringBuilder.append(in_trk_code);stringBuilder.append(";");
+        stringBuilder.append(acct_code);stringBuilder.append(";");
+        stringBuilder.append(auth_code);stringBuilder.append(";");
+        stringBuilder.append(frl);stringBuilder.append(";");
+        stringBuilder.append(ixc_code);stringBuilder.append(";");
+        stringBuilder.append(in_crt_id);stringBuilder.append(";");
+        stringBuilder.append(out_crt_id);stringBuilder.append(";");
+        stringBuilder.append(feat_flag);stringBuilder.append(";");
+        stringBuilder.append(code_return);stringBuilder.append(";");
+        stringBuilder.append(line_feed);stringBuilder.append(";");
+
+
+
+        return stringBuilder.toString();
     }
 }

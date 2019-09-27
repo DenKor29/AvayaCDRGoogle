@@ -151,10 +151,6 @@ public class MainWindow extends JFrame  implements ApplicationServerListener {
     @Override
     public void onMessageString(ApplicationServer applicationServer, TCPConnection tcpConnection,String value) {
 
-        String nameServer = applicationServer.getNameServer();
-
-            AvayaCDRData baseCDRData = new AvayaCDRData();
-            baseCDRData.SetPropertyCDR("Application", value);
 
 
     }

@@ -1,5 +1,6 @@
 package avayacdr.application;
 
+import avayacdr.core.AvayaCDRData;
 import avayacdr.network.TCPConnection;
 import avayacdr.network.TCPConnectionListener;
 
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
 
 
 public class ApplicationServer implements TCPConnectionListener {
@@ -48,7 +50,6 @@ public class ApplicationServer implements TCPConnectionListener {
     public  void start(int port,int timeoutAcept){
 
         GooglePostAuth();
-        GooglePostAppend("150300119;22409506239088;0001;0;*52;0;000");
 
         rxThread = new Thread(new Runnable() {
             @Override
@@ -68,7 +69,6 @@ public class ApplicationServer implements TCPConnectionListener {
         String response = httpPost.doPostJSON();
         token = getJsonKey(response,"token");
 
-        System.out.println("Response: "+ response );
         System.out.println("Token: "+ token );
 
 
@@ -83,7 +83,6 @@ public class ApplicationServer implements TCPConnectionListener {
         httpPost.addParameters("command","append");
         httpPost.addParameters("value",value);
         String response = httpPost.doPostJSON();
-        System.out.println("Response: "+ response );
 
         String result = getJsonKey(response,"result");
 
@@ -181,7 +180,10 @@ public class ApplicationServer implements TCPConnectionListener {
     public synchronized void onReceiveString(TCPConnection tcpConnection, String value) {
 
         eventListener.onMessageString(ApplicationServer.this,tcpConnection,value);
-        GooglePostAppend(value);
+        AvayaCDRData baseCDRData = new AvayaCDRData();
+        baseCDRData.SetPropertyCDR(value);
+
+        GooglePostAppend(baseCDRData.toString());
     }
 
     @Override

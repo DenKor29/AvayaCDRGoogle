@@ -2,7 +2,7 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
 <comment>avaya</comment>
-<entry key="appport">9000</entry>
+<entry key="appport">9101</entry>
 <entry key="appserverstart">0</entry>
 <entry key="apptimeoutacept">30000</entry>
 </properties>
